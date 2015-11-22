@@ -51,8 +51,19 @@ def pad_text(text, width=80, align='left'):
         for line in text:
             pad = width - len(line)
             right_pad = max(0, pad - left_pad)
-            line = ' '*left_pad + line + ' '*right_pad
-            output.append(line)
+            output.append(' '*left_pad + line + ' '*right_pad)
+    elif align == 'center':
+        for line in text:
+            pad = max(0, width - len(line))
+            left_pad = pad // 2
+            right_pad = pad - left_pad
+            output.append(' '*left_pad + line + ' '*right_pad)
+    elif align == 'right':
+        right_pad = needed_pad // 2
+        for line in text:
+            pad = width - len(line)
+            left_pad = max(0, pad - right_pad)
+            output.append(' '*left_pad + line + ' '*right_pad)
     else:
-        raise NotImplementedError("Only left align is implemented.")
+        raise ValueError("align must be one of 'left', 'right', or 'center'")
     return '\n'.join(output)
