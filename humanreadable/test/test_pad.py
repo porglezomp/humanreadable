@@ -1,5 +1,5 @@
 import humanreadable
-from hypothesis import given
+from hypothesis import given, example
 from hypothesis.strategies import integers, text
 
 
@@ -24,6 +24,7 @@ def test_left_padding(text, width):
     spaces = []
     for original, changed in zip(text.split('\n'), padded.split('\n')):
         if not original.strip():
+            assert len(changed) == width
             continue
         # Count the padding that was added to the line
         left_space = len(changed) - len(changed.lstrip(' '))
@@ -48,6 +49,7 @@ def test_right_padding(text, width):
     spaces = []
     for original, changed in zip(text.split('\n'), padded.split('\n')):
         if not original.strip():
+            assert len(changed) == width
             continue
         # Count the padding that was added to the right of the line
         right_space = len(changed) - len(changed.rstrip())
@@ -60,6 +62,7 @@ def test_right_padding(text, width):
 
 @given(text=text(alphabet='abcdefghijklmnopqrstuvwxyz \n'),
        width=integers(min_value=8, max_value=140))
+@example(text='  ', width=8)
 def test_center_padding(text, width):
     padded = humanreadable.pad_text(text, width, align='center')
     print('---1---')
@@ -69,6 +72,9 @@ def test_center_padding(text, width):
     print('-------')
 
     for original, changed in zip(text.split('\n'), padded.split('\n')):
+        if not changed.strip():
+            assert len(changed) == width
+            continue
         # Count the padding to the left of the line
         left_space = len(changed) - len(changed.lstrip(' '))
         left_space -= len(original) - len(original.lstrip(' '))
@@ -94,3 +100,23 @@ def test_wrong_align():
         pass
     else:
         assert False  # Unreachable!
+
+
+def test_pad_indented():
+    text = "Here's some text\n    and this text is indented"
+    expect = " Here's some text               \n     and this text is indented  "
+    assert humanreadable.pad_text(text, width=32) == expect
+
+
+
+
+
+
+
+
+
+
+
+
+
+

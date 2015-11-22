@@ -43,7 +43,7 @@ def justify_text(text, width=80):
 
 def pad_text(text, width=80, align='left'):
     text = [line.rstrip() for line in text.split('\n')]
-    max_width = max(len(line) for line in text)
+    max_width = min(width, max(len(line) for line in text))
     needed_pad = width - max_width
     output = []
     if align == 'left':
