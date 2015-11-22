@@ -9,6 +9,15 @@ def test_justify_widths(text, width):
         assert len(line) <= width
 
 
+def test_bad_width():
+    try:
+        humanreadable.justify_text("Hello, World!", width=1)
+    except ValueError:
+        pass
+    else:
+        assert False  # Unreachable
+
+
 def test_justify_specific():
     text = "Here's a specific piece of text that should be justified."
     assert (humanreadable.justify_text(text, 20) ==
