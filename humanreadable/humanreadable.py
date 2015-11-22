@@ -1,9 +1,20 @@
+#!/usr/bin/python
 from __future__ import print_function
 
 
 def find_paragraphs(text):
+    r"""
+    Locate all the paragraphs in a given piece of text and return a list of
+    paragraphs, where each paragraph is a list of lines.
+    Paragraphs are blocks of text that are seperated by any number of blank
+    lines.
+
+    >>> find_paragraphs("Here's some text!\n\nIt's in multiple paragraphs!")
+    [["Here's some text!"], ["It's in multiple paragraphs!"]]
+    """
     paragraphs = []
     paragraph = []
+
     for line in text.split('\n'):
         if line.strip() == '':
             paragraphs.append(paragraph)
@@ -15,10 +26,26 @@ def find_paragraphs(text):
 
 
 def combine_lines(lines):
+    """
+    Combine a list of lines into a single line, properly seperated by spaces.
+
+    >>> combine_lines(["Here's a line.", "Here's another."])
+    "Here's a line. Here's another."
+    """
     return ' '.join(line.strip() for line in lines)
 
 
 def justify_text(text, width=80):
+    r"""
+    Take a block of text and add line breaks in order to keep lines shorter
+    than the specified `width`.
+    Line breaks will be added at the closest word break before the `width`,
+    or hyphenation will be naively added at the end of the line if the last
+    space was too far (more than 8 characters) away from the end of the line.
+
+    >>> justify_text("This is just example text.", width=10)
+    'This is\njust\nexample\ntext.'
+    """
     if width < 8:
         raise ValueError("Invalid width {}, minimum accepted width is 8")
     lines = []
@@ -42,6 +69,25 @@ def justify_text(text, width=80):
 
 
 def pad_text(text, width=80, align='left'):
+    r"""
+    Pad text with spaces to a given width.
+
+    The `align` parameter lets you specify an alignment, either 'left',
+    'right', or 'center', which determines where the spaces are added.
+
+    Lines longer than the specified width will not be modified.
+
+    >>> pad_text('Hello!', width=8)
+    ' Hello! '
+    >>> pad_text('Hello\nto the world!', width=16)
+    ' Hello          \n to the world!  '
+    >>> pad_text('Hello\nto the world!', width=16, align='right')
+    '          Hello \n  to the world! '
+    >>> pad_text('Hello\nto the world!', width=16, align='center')
+    '     Hello      \n to the world!  '
+    >>> pad_text('Hello, World!', width=8)
+    'Hello, World!'
+    """
     text = [line.rstrip() for line in text.split('\n')]
     max_width = min(width, max(len(line) for line in text))
     needed_pad = width - max_width
@@ -67,3 +113,17 @@ def pad_text(text, width=80, align='left'):
     else:
         raise ValueError("align must be one of 'left', 'right', or 'center'")
     return '\n'.join(output)
+
+
+def readable(text, width, pad_width):
+    """
+    Run the full conversion pipeline on a piece of text.
+
+    This function finds the paragraphs, merges the sentences, breaks the lines
+    at `width`, and finally pads out the text to the desired `pad_width`.
+    """
+    paragraphs = find_paragraphs(text)
+    paragraphs = [combine_lines(paragraph) for paragraph in paragraphs]
+    paragraphs = [justify_text(paragraph, width) for paragraph in paragraphs]
+    text = '\n\n'.join(paragraphs)
+    return pad_text(text, pad_width, align='left')
